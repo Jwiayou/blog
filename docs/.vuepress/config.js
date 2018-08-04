@@ -5,7 +5,7 @@ module.exports = {
   ],
   themeConfig: {
     logo: `/white-deer.png`,
-    activeHeaderLinks: false, // Default: true
+    sidebarDepth: 0,
     nav: [
       {text: 'github', link: 'https://github.com/Jwiayou'},
       {text: 'sf.gg', link: 'https://segmentfault.com/u/jiangwei_5851efa237839/articles'}

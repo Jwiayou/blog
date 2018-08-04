@@ -1,5 +1,5 @@
 
-### 基础知识
+## 基础知识
 
 1. 使用`@`代替 `v-on`， 使用 `:`代替 `v-bind`
 
@@ -44,7 +44,7 @@
 > 可以在使用 `v-model.lazy` 惰性修饰符将 `input` 事件修改成 `change` 事件
 
 
-### 生命钩子
+# 生命钩子
 
 #### 1. beforeCreate
 > 在实例初始化之后，数据观测(data observer) 和 event/watcher 事件配置之前被调用
