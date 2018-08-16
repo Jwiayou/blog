@@ -1,7 +1,7 @@
 module.exports = {
   title: 'Deer',
   head: [
-    ['link', { rel: 'icon', href: `/white-deer.png` }],
+    ['link', {rel: 'icon', href: `/white-deer.png`}],
   ],
   themeConfig: {
     logo: `/white-deer.png`,
@@ -12,6 +12,7 @@ module.exports = {
     ],
     sidebar: [
       ['/', 'vue笔记'],
+      ['/TS/', 'TypeScript笔记'],
     ],
   }
 };
