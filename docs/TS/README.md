@@ -392,4 +392,168 @@ fibonacci.push('8');
 ```
 上例中，`push`方法只允许传入 `number` 类型参数，但是却传入一个  `string` 类型的参数，所以报错了
 
-### 未完待续。。。
+### 数组泛型
+也可以使用数组泛型（Array Generic） `Array<elemType>` 来表示数组：
+```TypeScript
+let fibonacci: Array<number> = [1, 1, 2, 3, 5];
+```
+
+关于泛型，可以参考泛型一章。
+
+###  用接口表示数组
+接口也可用来比描述数组
+```TypeScript
+interface NumberArray {
+    [index: number]: number;
+}
+let fibonacci: NumberArray = [1, 1, 2, 3, 5];
+```
+
+any在数组中的应用
+
+一个比较常见的做法是，用 `any` 表示数组中允许出现任意类型：
+```TypeScript
+let list: any[] = ['Xcat Liu', 25, {website: 'http://xcatliu.com' }];
+```
+
+### 类数组
+类数组（Array-like Object） 不是数组类型，比如 `arguments`:
+```TypeScript
+function sum() {
+    let args: number[] = arguments;
+}
+
+// index.ts(2,7): error TS2322: Type 'IArguments' is not assignable to type 'number[]'.
+//   Property 'push' is missing in type 'IArguments'.
+```
+
+事实上常见的类数组都有自己的接口定义， 如 `IArguments`,`NodeList`,`HTMLCollection`等：
+```TypeScript
+function sum() {
+    let args: IArguments = arguments;
+}
+
+// index.ts(2,7): error TS2322: Type 'IArguments' is not assignable to type 'number[]'.
+//   Property 'push' is missing in type 'IArguments'.
+```
+
+## 函数的类型
+
+### 函数声明
+再 JavaScript 中， 有两种常见的定义函数的方式 -- 函数声明（Function Declaration）和函数表达式（Function Expression）:
+```TypeScript
+// 函数声明（Function Declaration）
+function sum(x, y) {
+    return x + y;
+}
+
+// 函数表达式（Funtion Expression)
+let mySun = function (x, y) {
+    return x + y;
+}
+```
+
+一个函数的输入和输出，要在TypeScript中对其进行约束，需要把输入和输出都考虑到，其中函数声明的类型定义较简单：
+```TypeScript
+function sum(x: number, y: number): number } {
+    return x + y;
+}
+```
+
+注意，**输入多余的（或者少于要求的）参数，是不被允许的：
+```TypeScript
+function sum(x: number, y: number): number {
+    return x + y;
+}
+
+sum(1, 2, 3);
+
+// index.ts(4,1): error TS2346: Supplied parameters do not match any signature of call target.
+```
+```TypeScript
+function sum(x: number, y: number): number {
+    return x + y;
+}
+
+sum(1);
+
+// index.ts(4,1): error TS2346: Supplied parameters do not match any signature of call target.
+```
+
+### 函数表达式
+如果要我们现在写一个对函数表达式（Funtion Expression）的定义，可能会写成这样：
+```TypeScript
+let mySun = function (x: number, y: number) {
+    return x + y;
+}; 
+```
+ 这是可以通过编译的，不过事实上，上面的代码只是对等号右侧的匿名函数进行了类型定义，而等号左边的 `mySum`，是通过赋值操作进行类型推论而推断出来的。如果需要我们手动给 `mySun` 添加类型，则应该是这样：
+ ```TypeScript
+ let mySum: (x: number, y: number) => number = function (x: number, y: number): number {
+     return a + b;
+ }
+ ```
+ 注意不要混淆了 TypeScript 中的 `=>` 和 ES6 中的 `=>`。
+ 在 TypeScript 的类型定义中，`=>` 用来表示函数的定义，左边的输入类型，需要用括号括起来，右便是输出类型。
+
+### 用接口定义函数的形状
+我们也可以用接口的方式来顶一个函数需要符合的形状：
+```TypeScript
+interface SearchFunc {
+    (sounrce: string, subString: string): boolean;
+}
+
+let mySearch: SearchFunc;
+mySearch = function(source: string, subString: string) {
+    return source.search(subString) !== -1;
+}
+```
+
+### 可选参数
+前面提到，输入多余的（或者少于要求的）参数，是不允许的。那么如何定义可选的参数呢？
+与接口中的可选属性类似，我们用 `?` 表示可选的参数：
+```TypeScript
+function buildName(firstName: string, lastName?: string) {
+    if(lastName) {
+        return firstName + ' ' + lastName;
+    } else {
+        return firstName;
+    }
+}
+let tomcat = buildName('Tom', 'Cat');
+let tom = buildName('Tom');
+```
+需要注意的是，可选参数必须接再必需参数后面。换句话说，**可选参数后面不允许再出现必须参数了：**
+```TypeScript
+function buildName(firstName?: string, lastName: string) {
+    if(firstName) {
+        return firstName + ' ' + lastName;
+    } else {
+        return lastName;
+    }
+}
+let tomcat = buildName('Tom', 'Cat');
+let tom = buildName('Tom')
+
+// index.ts(1,40): error TS1016: A required parameter cannot follow an optional parameter.
+```
+
+### 参数默认值
+
+在 ES6 中， 我们允许给函数的参数缇娜家默认值，**TypeScript会将加了默认值的参数识别为可选参数：**
+```TypeScript
+function buildName(firstName: string, lastName: string = 'Cat') {
+    return firstName + ' ' + lastName;
+}
+let tomcat = buildName('Tom', 'Cat');
+let tom = buildName('Tom');
+```
+
+此时就不受「可选参数必须在必需参数后面」的限制了：
+```TypeScript
+function buildName(firstName: string = 'Tom', lastName: string) {
+    return firstName + ' ' + lastName;
+}
+let tomcat = buildName('Tom', 'Cat');
+let cat = buildName(undefined, 'Cat');
+```
